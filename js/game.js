@@ -1,0 +1,226 @@
+import lexicon from './russian_nouns.js';
+import letters from './buttons.js';
+import letterButton from './button.js';
+import { random } from './helpers.js';
+
+class game {
+    constructor(parent = document.body) {
+        this.lexicon = lexicon;
+        this.parent = parent;
+        if (!this.getSettings('difficulty')) {
+            this.setSettings({'difficulty': 'medium'});
+        }
+        this.difficulty = this.getSettings('difficulty');
+        this.messages = [];
+        this.input = [];
+        this.buttons = [];
+        if (!this.getSettings('seed')) {
+            this.setSettings({'seed': 1})
+        }
+        this.seed = Number(this.getSettings('seed'));
+
+        this.random = new random(this.seed);
+
+        this.init = this.init.bind(this);
+        this.main = this.main.bind(this);
+        this.layout = this.layout.bind(this);
+        this.keyboard = this.keyboard.bind(this);
+        this.createGameFieldRow = this.createGameFieldRow.bind(this);
+        this.showAlertMessage = this.showAlertMessage.bind(this);
+
+
+        this.init();
+    }
+
+    init() {
+        this.dictionary = this.lexicon[this.difficulty].toLowerCase().split(',');
+        // this.word = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
+        this.word = this.dictionary[Math.floor(this.random.next() * this.dictionary.length)];
+        this.wordLength = this.word.length;
+
+        this.layout();
+        this.keyboard();
+
+        document.addEventListener('keydown', this.main);
+    }
+
+    main(e) {
+        document.body.focus();
+        ////////////////BACKSPACE/////////////////
+        if (e.key === 'Backspace') {
+            this.backspaceClick(this);
+            return;
+        }
+        ////////////////ENTER/////////////////
+        if (e.key === 'Enter') {
+            this.enterClick(this);
+            return;
+        }
+        ////////////////А-Я/////////////////
+        if (/^[а-яА-Я]$/i.test(e.key)) {
+            if (this.input.length < this.wordLength) {
+                this.currentRow.children[this.input.length].innerText = e.key.toUpperCase();
+                this.input.push(e.key.toLowerCase());
+            }
+            return;
+        }
+        ////////////////OTHER/////////////////
+        if (/^[^а-яА-Я]$/i.test(e.key)) {
+            this.showAlertMessage('Только буквы А-Я!', 'Language alert');
+            return;
+        }
+    }
+
+    layout() {
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'gameWrapper';
+        this.gameField = document.createElement('div');
+        this.gameField.className = 'gameField';
+        this.wrapper.appendChild(this.gameField);
+        this.parent.appendChild(this.wrapper);
+
+        this.createGameFieldRow();
+    }
+
+    keyboard() {
+        this.gameKeyboard = document.createElement('div');
+        this.gameKeyboard.className = 'gameKeyboard';
+        this.wrapper.appendChild(this.gameKeyboard);
+        let keyboardRow = document.createElement('div');
+        keyboardRow.className = 'gameKeyboard__line';
+        this.gameKeyboard.appendChild(keyboardRow);
+        letters.forEach(el => {
+            if (el === '*') {
+                keyboardRow = document.createElement('div');
+                keyboardRow.className = 'gameKeyboard__line';
+                this.gameKeyboard.appendChild(keyboardRow);
+                return;
+            }
+            const button = new letterButton(keyboardRow, el, !/[а-яА-Я]/i.test(el));
+            const that = this;
+            button.callback = function (e) {
+                if (this.control && this.letter.toLowerCase() === 'enter') {
+                    that.enterClick(that);
+                    return;
+                }
+                if (this.control && this.letter.toLowerCase() === 'backspace') {
+                    that.backspaceClick(that);
+                    return;
+                }
+                if (that.input.length < that.wordLength) {
+                    that.currentRow.children[that.input.length].innerText = this.letter.toUpperCase();
+                    that.input.push(this.letter.toLowerCase());  
+                }
+            }
+            this.buttons.push(button);
+        });
+    }
+
+    createGameFieldRow() {
+        this.currentRow = document.createElement('div');
+        this.currentRow.className = 'gameField__row';
+        this.gameField.appendChild(this.currentRow);
+
+        for (let i = 0; i < this.wordLength; i++) {
+            const letterInRow = document.createElement('div');
+            letterInRow.className = 'gameField__letter';
+            this.currentRow.appendChild(letterInRow);
+        }
+
+        this.gameField.scrollTop = this.gameField.scrollHeight;
+    }
+
+    showAlertMessage(message, type) {
+        if (this.messages.filter(el => el.dataset.type === type).length !== 0) {
+            return;
+        }
+        const alertMessage = document.createElement('div');
+        alertMessage.className = 'gameField__alert';
+        alertMessage.innerText = message;
+        alertMessage.dataset.type = type;
+        document.body.appendChild(alertMessage);
+        this.messages.push(alertMessage);
+        setTimeout(() => {
+            alertMessage.classList.add('gameField__alert-hide');
+            setTimeout(() => {
+                this.messages = this.messages.filter(el => el !== alertMessage);
+                alertMessage.classList.remove('gameField__alert-hide');
+                alertMessage.remove();
+            }, 1000);
+        }, 1000);
+    }
+
+    enterClick(_that = this) {
+        if (_that.input.length === _that.wordLength) {
+            if (!_that.lexicon.hard.includes(_that.input.join(''))) {
+                _that.showAlertMessage('Такого слова нет!', 'Wrong word');
+                return;
+            }
+            let wordCopy = _that.word.split('');
+            let inputCopy = _that.input.slice();
+            for (let i = 0; i < inputCopy.length; i++) {
+                const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
+                if (!currentLetter.found) {
+                    currentLetter.element.style.backgroundColor = 'rgb(204, 204, 204)';
+                }
+                _that.currentRow.children[i].style.backgroundColor = 'rgb(204, 204, 204)';
+                if (inputCopy[i] === wordCopy[i]) {
+                    currentLetter.found = true;
+                    currentLetter.element.style.backgroundColor = 'rgb(17, 221, 17)';
+                    wordCopy[i] = '-';
+                    inputCopy[i] = '*';
+                    _that.currentRow.children[i].style.backgroundColor = 'rgb(17, 221, 17)';
+                    continue;
+                }
+            }
+            for (let i = 0; i < inputCopy.length; i++) {
+                if (wordCopy.includes(inputCopy[i])) {
+                    const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
+                    if (!currentLetter.found) {
+                        currentLetter.element.style.backgroundColor = 'rgb(255, 221, 17)'
+                    }
+                    wordCopy[wordCopy.indexOf(inputCopy[i])] = '-';
+                    inputCopy[i] = '*';
+                    _that.currentRow.children[i].style.backgroundColor = 'rgb(255, 221, 17)';
+                    continue;
+                }
+            }
+
+            if (_that.input.join('') !== _that.word) {
+                _that.createGameFieldRow();
+                _that.input.length = 0;
+            } else {
+                _that.destroy(_that);
+                _that.seed = _that.random.x;
+                _that.setSettings({ 'seed': _that.seed })
+                _that.showAlertMessage('Победа!', 'Victory alert');
+            }
+        }
+    }
+
+    backspaceClick(_that) {
+        if (_that.input.length >= 1) {
+            _that.currentRow.children[_that.input.length - 1].innerText = '';
+            _that.input.pop();
+        }
+    }
+
+    destroy(_that) {
+        document.removeEventListener('keydown', _that.main);
+        _that.buttons.forEach(el => el.element.onclick = null);
+    }
+
+    getSettings(param) {
+        return localStorage.getItem(param);
+    }
+
+    setSettings(params) {
+        if (!params) throw new Error('Parameters for setSettings wasn\'t set');
+        if (typeof params !== 'object' || Array.isArray(params)) throw new Error('Wrong parameter type in setSettings');
+        for (let [key, value] of Object.entries(params)) {
+            localStorage.setItem(key, value);
+        }
+    }
+}
+
+export default game;

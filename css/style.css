@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Oswald', sans-serif;
+}
+
+.gameWrapper {
+    /* fsz = 100px on 1024px width   and   30px on 220px
+    // divider = on max width (1024px - 220px) / 100px - 30px
+    // 804 / 70 = 11.4 */
+    --size: clamp(30px, calc(30px + (100vw - 220px) / 11.4), 100px);
+
+    max-width: 1024px;
+    margin: 0 auto;
+    background-color: antiquewhite;
+}
+
+.gameField {
+    height: 50vh;
+    padding: 10px;
+    overflow-y: scroll;
+}
+.gameField__row {
+    display: flex;
+    padding-bottom: 20px;
+    align-items: center;
+    justify-content: center;
+}
+.gameField__letter {
+    flex-shrink: 0;
+    width: var(--size);
+    height: var(--size);
+    text-align: center;
+    line-height: var(--size);
+    font-size: calc(var(--size) * 0.7);
+    border: 1px solid #000;
+    background-color: #fafafa;
+}
+.gameField__alert {
+    position: fixed;
+    width: 200px;
+    height: 50px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgb(252, 206, 0);
+    font-size: 1em;
+    line-height: 50px;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: opacity 1s ease-in-out;
+}
+.gameField__alert-hide {
+    opacity: 0;
+}
+
+.gameKeyboard {
+    height: 50vh;
+    padding: 50px;
+}
+
+.gameKeyboard__line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff8059;
+}
+.gameKeyboard__key {
+    width: 70px;
+    height: 70px;
+    text-align: center;
+    font-size: calc(70px * .7);
+    line-height: 70px;
+    border: 1px solid #000;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.gameKeyboard__key-special {
+    width: calc(70px * 1.5);
+    font-size: 20px;
+}
