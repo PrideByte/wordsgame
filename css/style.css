@@ -98,3 +98,9 @@ body {
     width: calc(var(--size) * 1.5);
     font-size: calc(var(--size) * .25);
 }
+
+@media screen and (max-width: 480px) {
+    .gameKeyboard {
+        padding: 0 5px;
+    }
+}
