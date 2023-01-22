@@ -8,16 +8,22 @@ class game {
         this.lexicon = lexicon;
         this.parent = parent;
         if (!this.getSettings('difficulty')) {
-            this.setSettings({'difficulty': 'medium'});
+            this.setSettings('difficulty', 'medium');
         }
         this.difficulty = this.getSettings('difficulty');
         this.messages = [];
         this.input = [];
         this.buttons = [];
         if (!this.getSettings('seed')) {
-            this.setSettings({'seed': 1})
+            this.setSettings('seed', 1)
         }
         this.seed = Number(this.getSettings('seed'));
+        this.stats = this.getSettings('stats') || [];
+        if (!this.getSettings('startTime')) {
+            this.setSettings('startTime', Date.now());
+        }
+        this.startTime = Number(this.getSettings('startTime'));
+        this.attempts = Number(this.getSettings('attempts')) ?? 0;
 
         this.random = new random(this.seed);
 
@@ -27,6 +33,7 @@ class game {
         this.keyboard = this.keyboard.bind(this);
         this.createGameFieldRow = this.createGameFieldRow.bind(this);
         this.showAlertMessage = this.showAlertMessage.bind(this);
+        this.addStats = this.addStats.bind(this);
 
 
         this.init();
@@ -147,7 +154,7 @@ class game {
                 alertMessage.classList.remove('gameField__alert-hide');
                 alertMessage.remove();
             }, 1000);
-        }, 1000);
+        }, 2000);
     }
 
     enterClick(_that = this) {
@@ -161,15 +168,15 @@ class game {
             for (let i = 0; i < inputCopy.length; i++) {
                 const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
                 if (!currentLetter.found) {
-                    currentLetter.element.style.backgroundColor = 'rgb(204, 204, 204)';
+                    currentLetter.element.style.backgroundColor = 'var(--clr-wrong)';
                 }
-                _that.currentRow.children[i].style.backgroundColor = 'rgb(204, 204, 204)';
+                _that.currentRow.children[i].style.backgroundColor = 'var(--clr-wrong)';
                 if (inputCopy[i] === wordCopy[i]) {
                     currentLetter.found = true;
-                    currentLetter.element.style.backgroundColor = 'rgb(17, 221, 17)';
+                    currentLetter.element.style.backgroundColor = 'var(--clr-found)';
                     wordCopy[i] = '-';
                     inputCopy[i] = '*';
-                    _that.currentRow.children[i].style.backgroundColor = 'rgb(17, 221, 17)';
+                    _that.currentRow.children[i].style.backgroundColor = 'var(--clr-found)';
                     continue;
                 }
             }
@@ -177,22 +184,29 @@ class game {
                 if (wordCopy.includes(inputCopy[i])) {
                     const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
                     if (!currentLetter.found) {
-                        currentLetter.element.style.backgroundColor = 'rgb(255, 221, 17)'
+                        currentLetter.element.style.backgroundColor = 'var(--clr-alert)'
                     }
                     wordCopy[wordCopy.indexOf(inputCopy[i])] = '-';
                     inputCopy[i] = '*';
-                    _that.currentRow.children[i].style.backgroundColor = 'rgb(255, 221, 17)';
+                    _that.currentRow.children[i].style.backgroundColor = 'var(--clr-alert)';
                     continue;
                 }
             }
 
             if (_that.input.join('') !== _that.word) {
+                _that.attempts++;
+                _that.setSettings('attempts', _that.attempts);
                 _that.createGameFieldRow();
                 _that.input.length = 0;
             } else {
-                _that.destroy(_that);
+                _that.removeEvents(_that);
+                _that.attempts++;
+                _that.addStats();
+                _that.attempts = 0;
+                _that.setSettings('attempts', 0);
+                _that.removeSettings('startTime');
                 _that.seed = _that.random.x;
-                _that.setSettings({ 'seed': _that.seed })
+                _that.setSettings('seed', _that.seed);
                 _that.showAlertMessage('Победа!', 'Victory alert');
             }
         }
@@ -205,21 +219,32 @@ class game {
         }
     }
 
-    destroy(_that) {
+    removeEvents(_that) {
         document.removeEventListener('keydown', _that.main);
         _that.buttons.forEach(el => el.element.onclick = null);
     }
 
-    getSettings(param) {
-        return localStorage.getItem(param);
+    addStats() {
+        this.stats.push({
+            seed: this.seed,
+            word: this.word,
+            attempts: this.attempts,
+            time: Date.now() - this.startTime
+        });
+        this.setSettings('stats', this.stats);
     }
 
-    setSettings(params) {
-        if (!params) throw new Error('Parameters for setSettings wasn\'t set');
-        if (typeof params !== 'object' || Array.isArray(params)) throw new Error('Wrong parameter type in setSettings');
-        for (let [key, value] of Object.entries(params)) {
-            localStorage.setItem(key, value);
-        }
+    getSettings(param) {
+        console.log(param)
+        return JSON.parse(localStorage.getItem(param));
+    }
+
+    setSettings(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    removeSettings(param) {
+        localStorage.removeItem(param);
     }
 }
 
