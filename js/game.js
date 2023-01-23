@@ -2,6 +2,7 @@ import lexicon from './russian_nouns.js';
 import letters from './buttons.js';
 import letterButton from './button.js';
 import { random } from './helpers.js';
+import { Header } from './header.js';
 
 class game {
     constructor(parent = document.body) {
@@ -15,7 +16,7 @@ class game {
         this.input = [];
         this.buttons = [];
         if (!this.getSettings('seed')) {
-            this.setSettings('seed', 1)
+            this.setSettings('seed', 100)
         }
         this.seed = Number(this.getSettings('seed'));
         this.stats = this.getSettings('stats') || [];
@@ -52,7 +53,6 @@ class game {
     }
 
     main(e) {
-        document.body.focus();
         ////////////////BACKSPACE/////////////////
         if (e.key === 'Backspace') {
             this.backspaceClick(this);
@@ -79,11 +79,15 @@ class game {
     }
 
     layout() {
+        const header = new Header();
         this.wrapper = document.createElement('div');
         this.wrapper.className = 'gameWrapper';
+        this.gameFieldWrapper = document.createElement('div');
+        this.gameFieldWrapper.className = 'gameField__wrapper';
         this.gameField = document.createElement('div');
         this.gameField.className = 'gameField';
-        this.wrapper.appendChild(this.gameField);
+        this.gameFieldWrapper.appendChild(this.gameField);
+        this.wrapper.appendChild(this.gameFieldWrapper);
         this.parent.appendChild(this.wrapper);
 
         this.createGameFieldRow();
@@ -226,6 +230,7 @@ class game {
 
     addStats() {
         this.stats.push({
+            id: this.stats.length,
             seed: this.seed,
             word: this.word,
             attempts: this.attempts,
@@ -235,7 +240,6 @@ class game {
     }
 
     getSettings(param) {
-        console.log(param)
         return JSON.parse(localStorage.getItem(param));
     }
 
