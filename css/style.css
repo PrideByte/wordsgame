@@ -14,7 +14,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Oswald', sans-serif;
-    transition: color, background, box-shadow .2s ease-in-out;
+    transition: all .2s ease-in-out;
 }
 
 body {
@@ -57,13 +57,10 @@ body {
 }
 
 .gameHeader {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
     width: 100%;
     max-width: calc(12 * var(--key-size));
     height: 10%;
+    min-height: 40px;
     margin: 0 auto;
     padding: 5px;
     display: flex;
@@ -93,13 +90,10 @@ body {
 }
 
 .gameWrapper {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
     width: 100%;
     max-width: 1024px;
     height: 90%;
+    min-height: 360px;
     margin: 0 auto;
 }
 
@@ -107,25 +101,7 @@ body {
     position: relative;
     height: 60%;
     overflow: hidden;
-}
-
-.gameField__wrapper::before,
-.gameField__wrapper::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    left: 0;
-    height: 10px;
-    background: linear-gradient(transparent, var(--background-color));
-}
-
-.gameField__wrapper::before {
-    top: 0;
-    scale: 1 -1;
-}
-
-.gameField__wrapper::after {
-    bottom: 0;
+    box-shadow: inset 0 0 10px 10px var(--background-color);
 }
 
 .gameField {
@@ -141,11 +117,25 @@ body {
 
 
 .gameField__row {
+    position: relative;
     display: flex;
     padding-bottom: 10px;
     align-items: center;
     justify-content: center;
+    z-index: -1;
+    opacity: 0;
+    animation: show-row 0.2s ease-in-out 0.1s normal forwards;
 }
+
+@keyframes show-row {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .gameField__letter {
     flex-shrink: 0;
     width: var(--gameField-size);
