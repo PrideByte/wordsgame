@@ -14,7 +14,9 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Oswald', sans-serif;
-    transition: all .2s ease-in-out;
+    transition: background-color .2s ease-in-out,
+                border-color .2s ease-in-out,
+                box-shadow .2s ease-in-out;
 }
 
 body {
@@ -124,7 +126,7 @@ body {
     justify-content: center;
     z-index: -1;
     opacity: 0;
-    animation: show-row 0.2s ease-in-out 0.1s normal forwards;
+    animation: show-row 0.2s ease-in-out normal forwards;
 }
 
 @keyframes show-row {
