@@ -36,18 +36,15 @@ class game {
         this.showAlertMessage = this.showAlertMessage.bind(this);
         this.addStats = this.addStats.bind(this);
 
-
         this.init();
+        this.layout();
+        this.keyboard();
     }
 
     init() {
         this.dictionary = this.lexicon[this.difficulty].toLowerCase().split(',');
-        // this.word = this.dictionary[Math.floor(Math.random() * this.dictionary.length)];
         this.word = this.dictionary[Math.floor(this.random.next() * this.dictionary.length)];
         this.wordLength = this.word.length;
-
-        this.layout();
-        this.keyboard();
 
         document.addEventListener('keydown', this.main);
     }
