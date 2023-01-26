@@ -1,3 +1,5 @@
+import { Stats } from "./stats.js";
+
 export class Header {
     constructor() {
         if (!this.getSettings('theme')) {
@@ -93,7 +95,8 @@ export class Header {
     }
 
     showStats() {
-        console.log('Статы');
+        this.closeMenu();
+        this.statsModal = new Stats(this.element);
     }
 
     showModal() {

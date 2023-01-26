@@ -1,4 +1,4 @@
-import game from './game.js';
+import Game from './game.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => document.body.classList.add('transition'), 0);
@@ -7,5 +7,5 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.clear();
         localStorage.setItem('version', JSON.stringify(gameVersion));
     }
-    let g = new game(document.body);
+    let g = new Game(document.body);
 });
