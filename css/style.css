@@ -43,6 +43,7 @@ body {
     --clr-alert: rgb(252, 206, 0);
     --clr-found: rgb(17, 221, 17);
     --shadow: rgba(0, 0, 0, 0.4);
+    --overlay: rgba(255, 255, 255, 0.8);
     
     color: var(--font-color);
     background-color: var(--background-color);
@@ -55,6 +56,7 @@ body {
     --clr-alert: rgb(168, 137, 0);
     --clr-found: rgb(7, 88, 7);
     --shadow: rgba(255, 255, 255, 0.5);
+    --overlay: rgba(0, 0, 0, 0.8);
 }
 
 .transition {
@@ -149,7 +151,7 @@ li {
     inset: 0;
     z-index: 200;
     padding: calc(var(--header-size) * 2);
-    background-color: var(--shadow);
+    background-color: var(--overlay);
 }
 
 .gameModal {
@@ -255,10 +257,16 @@ li {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 5px;
+    padding-bottom: 2px;
     font-size: calc(var(--modal-desc) * .75);
     line-height: var(--modal-desc);
     font-weight: 100;
     letter-spacing: 1px;
+    text-align: center;
+    border: solid var(--font-color);
+    border-width: 0 0 1px;
+    box-shadow: inset 0 0 7px var(--overlay);
 }
 
 .gameModal__row-item {
@@ -270,20 +278,17 @@ li {
     width: 20%;
 }
 
-.gameModal__row-seed {
-    width: 20%;
-}
-
 .gameModal__row-id {
-    width: 5%;
+    width: 15%;
 }
 
 .gameModal__row-tries {
     width: 15%;
+    text-overflow: ellipsis;
 }
 
 .gameModal__row-time {
-    width: 40%;
+    width: 45%;
 }
 
 .gameWrapper {
