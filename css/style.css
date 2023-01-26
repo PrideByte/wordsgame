@@ -6,7 +6,6 @@
          url('../fonts/wordsgame-icons-webfont.woff') format('woff');
     font-weight: 400;
     font-style: normal;
-
 }
 
 * {
@@ -14,9 +13,6 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Oswald', sans-serif;
-    transition: background-color .2s ease-in-out,
-                border-color .2s ease-in-out,
-                box-shadow .2s ease-in-out;
 }
 
 body {
@@ -32,6 +28,14 @@ body {
     // divider = on max width (1024px - 320px) / 32px - 18px
     // 704 / 14 = 30.2 */
     --header-size: clamp(18px, calc(18px + (100vw - 320px) / 50), 32px);
+    /* letter size = 22px on 1024px width and 18px on 320px
+    // divider = on max width (1024px - 320px) / 22px - 18px
+    // 704 / 4 = 176 */
+    --menu-items-fsz: clamp(18px, calc(18px + (100vw - 320px) / 176), 22px);
+    /* letter size = 20px on 1024px width and 14px on 320px
+    // divider = on max width (1024px - 320px) / 20px - 14px
+    // 704 / 6 = 117.3 */
+    --modal-desc: clamp(14px, calc(14px + (100vw - 320px) / 117), 20px);
 
     --font-color: #111;
     --background-color: #f3f3f3;
@@ -39,12 +43,12 @@ body {
     --clr-alert: rgb(252, 206, 0);
     --clr-found: rgb(17, 221, 17);
     --shadow: rgba(0, 0, 0, 0.4);
-
+    
     color: var(--font-color);
     background-color: var(--background-color);
 }
 
-body.dark-theme {
+.dark-theme {
     --font-color: #f3f3f3;
     --background-color: #111;
     --clr-wrong: rgb(95, 94, 94);
@@ -53,9 +57,18 @@ body.dark-theme {
     --shadow: rgba(255, 255, 255, 0.5);
 }
 
+.transition {
+    transition: background-color .2s ease-in-out;
+}
+
 html,
 body {
     height: 100%;
+}
+
+ul,
+li {
+    list-style: none;
 }
 
 .gameHeader {
@@ -70,7 +83,7 @@ body {
     justify-content: space-between;
 }
 
-.gameHeader__settingsbtn,
+.gameHeader__menubtn,
 .gameHeader__themebtn {
     display: flex;
     aspect-ratio: 1;
@@ -91,6 +104,157 @@ body {
     text-align: center;
 }
 
+.gameHeader__menu {
+    position: fixed;
+    top: 0;
+    width: clamp(150px, 30%, 320px);
+    padding: 20px;
+    transform: translateY(-110%);
+    z-index: 100;
+    font-size: var(--menu-items-fsz);
+    background-color: var(--background-color);
+    box-shadow: 1px 1px 2px var(--shadow);
+    transition: transform .2s ease-in-out,
+                background-color .2s ease-in-out,
+                box-shadow .2s ease-in-out;
+}
+
+.gameHeader__menu-opened {
+    transform: translateY(0);
+}
+
+.gameHeader__menu-close {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: calc(var(--header-size) * 2);
+    font-family: 'wordsgameicons', 'Oswald', sans-serif;
+    font-size: calc(var(--header-size) * 1.8);
+    line-height: calc(var(--header-size) * 2);
+    border-radius: 0 0 10px;
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--background-color);
+    box-shadow: 1px 1px 2px var(--shadow);
+    transition: background-color .2s ease-in-out,
+                box-shadow .2s ease-in-out;
+}
+
+.gameHeader__menu-item {
+    cursor: pointer;
+}
+
+.gameModal__wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    padding: calc(var(--header-size) * 2);
+    background-color: var(--shadow);
+}
+
+.gameModal {
+    position: relative;
+    width: 100%;
+    max-width: calc(12 * var(--key-size));
+    height: 100%;
+    margin: auto;
+    padding: calc(var(--header-size) * 2) 10px 10px;
+    border-radius: 5px;
+    background-color: var(--background-color);
+    box-shadow: 2px 2px 4px var(--shadow);
+    overflow: hidden;
+}
+
+.gameModal__content {
+    height: 100%;
+    min-height: 100%;
+    overflow-y: scroll;
+    padding-right: 10px;
+    /* scrollbar-width: none; */
+}
+
+/* .gameModal__content::-webkit-scrollbar {
+    width: 0;
+} */
+
+.gameModal__closebtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(var(--header-size) * 2);
+    font-family: 'wordsgameicons', 'Oswald', sans-serif;
+    font-size: calc(var(--header-size) * 1.8);
+    line-height: calc(var(--header-size) * 2);
+    cursor: pointer;
+}
+
+.gameModal__title,
+.gameModal__subtitle,
+.gameModal__description {
+    margin-bottom: 10px;
+}
+
+.gameModal__title {
+    font-size: calc(var(--modal-desc) * 1.6);
+    line-height: calc(var(--modal-desc) * 1.8);
+    font-weight: 600;
+}
+
+.gameModal__description,
+.gameModal__example-wordDesc {
+    font-size: var(--modal-desc);
+    line-height: calc(var(--modal-desc) * 1.1);
+    font-weight: 100;
+    letter-spacing: 1px;
+}
+
+.gameModal__subtitle {
+    font-size: calc(var(--modal-desc) * 1.3);
+    line-height: calc(var(--modal-desc) * 1.5);
+    font-weight: 500;
+}
+
+.gameModal__example {
+    padding-bottom: 10px;
+}
+
+.gameModal__example-word {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.gameModal__example-letter {
+    display: flex;
+    width: calc(var(--modal-desc) * 1.5);
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--modal-desc) * 1.1);
+    line-height: calc(var(--modal-desc) * 1.5);
+    font-weight: 400;
+    border: 1px solid var(--font-color);
+}
+
+.gameModal__example-inplace {
+    background-color: var(--clr-found);
+}
+
+.gameModal__example-inword {
+    background-color: var(--clr-alert);
+}
+
+.gameModal__example-wrong {
+    background-color: var(--clr-wrong);
+}
+
+.gameModal__line {
+    margin: 15px 0;
+    border-width: 0 0 1px;
+    border-color: var(--shadow);
+}
+
 .gameWrapper {
     width: 100%;
     max-width: 1024px;
@@ -104,6 +268,7 @@ body {
     height: 60%;
     overflow: hidden;
     box-shadow: inset 0 0 10px 10px var(--background-color);
+    transition: box-shadow .2s ease-in-out;
 }
 
 .gameField {
@@ -146,6 +311,8 @@ body {
     line-height: var(--gameField-size);
     font-size: calc(var(--gameField-size) * 0.7);
     border: 1px solid var(--font-color);
+    transition: background-color .2s ease-in-out,
+                border-color .2s ease-in-out;
 }
 .gameField__alert {
     position: fixed;
@@ -192,6 +359,8 @@ body {
     box-shadow: inset 0 0 3px 1px var(--shadow);
     cursor: pointer;
     user-select: none;
+    transition: border-color .2s ease-in-out,
+                box-shadow .2s ease-in-out;
 }
 
 .gameKeyboard__key-special {
