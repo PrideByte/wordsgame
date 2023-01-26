@@ -6,7 +6,6 @@ export class Stats {
         } else {
             this.stats = this.getSettings('stats');
         }
-        console.log(this.stats);
 
         this.showModal = this.showModal.bind(this);
 
@@ -31,19 +30,24 @@ export class Stats {
         const rowHeader = document.createElement('ul');
         rowHeader.className = 'gameModal__row-header';
         rowHeader.innerHTML = `<li class='gameModal__row-item gameModal__row-id'>ID</li>
-        <li class='gameModal__row-item gameModal__row-seed'>SEED</li>
-        <li class='gameModal__row-item gameModal__row-word'>СЛОВО</li>
-        <li class='gameModal__row-item gameModal__row-tries'>ПОП...</li>
-        <li class='gameModal__row-item gameModal__row-time'>ВРЕМЯ</li>`;
+            <li class='gameModal__row-item gameModal__row-word'>СЛОВО</li>
+            <li class='gameModal__row-item gameModal__row-tries'>ПОПЫТОК</li>
+            <li class='gameModal__row-item gameModal__row-time'>ВРЕМЯ</li>`;
         this.modalContent.appendChild(rowHeader);
 
         this.stats.forEach(el => {
             const time = new Date(el.time);
-            const timeLine = `${time.getUTCDate(time) - 1}D:${time.getUTCHours(time)}H:${time.getUTCMinutes(time)}M:${time.getUTCSeconds(time)}S`;
+            const timeLine = `${time.getUTCDate(time) - 1}Д:${time.getUTCHours(time)}Ч:${time.getUTCMinutes(time)}М:${time.getUTCSeconds(time)}С`;
             const row = document.createElement('div');
+            if (el.attempts <= 3) {
+                row.style.backgroundColor = 'var(--clr-found)';
+            } else if (el.attempts > 3 && el.attempts <= 6) {
+                row.style.backgroundColor = 'var(--clr-alert)';
+            } else {
+                row.style.backgroundColor = 'var(--clr-wrong)';
+            }
             row.className = 'gameModal__row';
             row.innerHTML = `<li class='gameModal__row-item gameModal__row-id'>${el.id}</li>
-                <li class='gameModal__row-item gameModal__row-seed'>${el.seed}</li>
                 <li class='gameModal__row-item gameModal__row-word'>${el.word.toUpperCase()}</li>
                 <li class='gameModal__row-item gameModal__row-tries'>${el.attempts}</li>
                 <li class='gameModal__row-item gameModal__row-time'>${timeLine}</li>`;
