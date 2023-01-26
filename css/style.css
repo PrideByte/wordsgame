@@ -170,12 +170,7 @@ li {
     min-height: 100%;
     overflow-y: scroll;
     padding-right: 10px;
-    /* scrollbar-width: none; */
 }
-
-/* .gameModal__content::-webkit-scrollbar {
-    width: 0;
-} */
 
 .gameModal__closebtn {
     position: absolute;
@@ -253,6 +248,42 @@ li {
     margin: 15px 0;
     border-width: 0 0 1px;
     border-color: var(--shadow);
+}
+
+.gameModal__row-header,
+.gameModal__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: calc(var(--modal-desc) * .75);
+    line-height: var(--modal-desc);
+    font-weight: 100;
+    letter-spacing: 1px;
+}
+
+.gameModal__row-item {
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.gameModal__row-word {
+    width: 20%;
+}
+
+.gameModal__row-seed {
+    width: 20%;
+}
+
+.gameModal__row-id {
+    width: 5%;
+}
+
+.gameModal__row-tries {
+    width: 15%;
+}
+
+.gameModal__row-time {
+    width: 40%;
 }
 
 .gameWrapper {

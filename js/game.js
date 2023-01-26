@@ -1,10 +1,10 @@
 import lexicon from './russian_nouns.js';
 import letters from './buttons.js';
 import letterButton from './button.js';
-import { random } from './helpers.js';
+import { Random } from './helpers.js';
 import { Header } from './header.js';
 
-class game {
+class Game {
     constructor(parent = document.body) {
         this.lexicon = lexicon;
         this.parent = parent;
@@ -26,7 +26,7 @@ class game {
         this.startTime = Number(this.getSettings('startTime'));
         this.attempts = Number(this.getSettings('attempts')) ?? 0;
 
-        this.random = new random(this.seed);
+        this.random = new Random(this.seed);
 
         this.init = this.init.bind(this);
         this.main = this.main.bind(this);
@@ -249,4 +249,4 @@ class game {
     }
 }
 
-export default game;
+export default Game;

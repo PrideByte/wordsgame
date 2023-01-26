@@ -1,4 +1,4 @@
-export class random {
+export class Random {
     constructor(seed = 1) {
         if (typeof seed !== 'number') {
             throw new Error('Parameter seed must be numeric');
