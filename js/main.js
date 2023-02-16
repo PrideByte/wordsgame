@@ -1,7 +1,7 @@
 import Game from './game.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => document.body.classList.add('transition'), 0);
+    requestAnimationFrame(() => document.body.classList.add('transition'));
     const gameVersion = 'v2.2';
     if (JSON.parse(localStorage.getItem('version')) !== gameVersion) {
         localStorage.clear();

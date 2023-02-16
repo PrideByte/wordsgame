@@ -1,32 +1,37 @@
+import Element from './components/default.js';
+import Header from './header.js';
+import { Random, getSettings, setSettings, removeSettings } from './helpers.js';
 import lexicon from './russian_nouns.js';
-import letters from './buttons.js';
-import letterButton from './button.js';
-import { Random } from './helpers.js';
-import { Header } from './header.js';
+import AlertMessage from './components/alert.js';
+import Row from './components/gameRow.js';
+import Keyboard from './components/keyboard.js';
+import Modal from './components/modal.js';
 
-class Game {
+class Game extends Element {
     constructor(parent = document.body) {
-        this.lexicon = lexicon;
-        this.parent = parent;
-        if (!this.getSettings('difficulty')) {
-            this.setSettings('difficulty', 'medium');
-        }
-        this.difficulty = this.getSettings('difficulty');
-        this.messages = [];
-        this.input = [];
-        this.buttons = [];
-        if (!this.getSettings('seed')) {
-            this.setSettings('seed', 100)
-        }
-        this.seed = Number(this.getSettings('seed'));
-        this.stats = this.getSettings('stats') || [];
-        if (!this.getSettings('startTime')) {
-            this.setSettings('startTime', Date.now());
-        }
-        this.startTime = Number(this.getSettings('startTime'));
-        this.attempts = Number(this.getSettings('attempts')) ?? 0;
+        const header = new Header();
 
-        this.random = new Random(this.seed);
+        super({
+            paren: parent,
+            classNames: 'gameWrapper'
+        });
+        this.element.onclick = null;
+
+        if (!getSettings('difficulty')) {
+            setSettings('difficulty', 'medium');
+        }
+        this.difficulty = getSettings('difficulty');
+
+        this.lexicon = lexicon[this.difficulty] ?? lexicon['medium'];
+        this.dictionary = this.lexicon.toLowerCase().split(',');
+
+        this.messages = [];
+
+        this.gameFieldWrapper = new Element({
+            parent: this.element,
+            classNames: 'gameField__wrapper'
+        });
+        this.gameFieldWrapper.element.onclick = null;
 
         this.init = this.init.bind(this);
         this.main = this.main.bind(this);
@@ -35,35 +40,75 @@ class Game {
         this.createGameFieldRow = this.createGameFieldRow.bind(this);
         this.showAlertMessage = this.showAlertMessage.bind(this);
         this.addStats = this.addStats.bind(this);
+        this.backspaceClick = this.backspaceClick.bind(this);
+        this.enterClick = this.enterClick.bind(this);
 
         this.init();
-        this.layout();
         this.keyboard();
     }
 
     init() {
-        this.dictionary = this.lexicon[this.difficulty].toLowerCase().split(',');
+        this.stats = getSettings('stats') || [];
+
+        if (!getSettings('seed')) {
+            setSettings('seed', 500);
+        }
+        this.seed = Number(getSettings('seed'));
+
+        this.random = new Random(this.seed);
+
+        if (!getSettings('startTime')) {
+            setSettings('startTime', Date.now());
+        }
+        this.startTime = Number(getSettings('startTime'));
+
+        this.attempts = Number(getSettings('attempts')) ?? 0;
+
+        this.input = [];
+
         this.word = this.dictionary[Math.floor(this.random.next() * this.dictionary.length)];
         this.wordLength = this.word.length;
 
         document.addEventListener('keydown', this.main);
+
+        this.layout();
+    }
+
+    layout() {
+        this.gameField = new Element({
+            parent: this.gameFieldWrapper.element,
+            classNames: 'gameField'
+        });
+        this.gameField.element.onclick = null;
+
+        this.createGameFieldRow();
+    }
+
+    createGameFieldRow() {
+        this.currentRow = new Row(this.gameField.element, this.wordLength);
+
+        this.gameField.element.scrollTop = this.gameField.element.scrollHeight;
+    }
+
+    keyboard() {
+        this.gameKeyboard = new Keyboard(this.element, this);
     }
 
     main(e) {
         ////////////////BACKSPACE/////////////////
-        if (e.key === 'Backspace') {
-            this.backspaceClick(this);
+        if (e.key.toLowerCase() === 'backspace') {
+            this.backspaceClick();
             return;
         }
         ////////////////ENTER/////////////////
-        if (e.key === 'Enter') {
-            this.enterClick(this);
+        if (e.key.toLowerCase() === 'enter') {
+            this.enterClick();
             return;
         }
         ////////////////А-Я/////////////////
         if (/^[а-яА-Я]$/i.test(e.key)) {
             if (this.input.length < this.wordLength) {
-                this.currentRow.children[this.input.length].innerText = e.key.toUpperCase();
+                this.currentRow.setText(this.input.length, e.key.toUpperCase());
                 this.input.push(e.key.toLowerCase());
             }
             return;
@@ -75,154 +120,88 @@ class Game {
         }
     }
 
-    layout() {
-        const header = new Header();
-        this.wrapper = document.createElement('div');
-        this.wrapper.className = 'gameWrapper';
-        this.gameFieldWrapper = document.createElement('div');
-        this.gameFieldWrapper.className = 'gameField__wrapper';
-        this.gameField = document.createElement('div');
-        this.gameField.className = 'gameField';
-        this.gameFieldWrapper.appendChild(this.gameField);
-        this.wrapper.appendChild(this.gameFieldWrapper);
-        this.parent.appendChild(this.wrapper);
-
-        this.createGameFieldRow();
-    }
-
-    keyboard() {
-        this.gameKeyboard = document.createElement('div');
-        this.gameKeyboard.className = 'gameKeyboard';
-        this.wrapper.appendChild(this.gameKeyboard);
-        let keyboardRow = document.createElement('div');
-        keyboardRow.className = 'gameKeyboard__line';
-        this.gameKeyboard.appendChild(keyboardRow);
-        letters.forEach(el => {
-            if (el === '*') {
-                keyboardRow = document.createElement('div');
-                keyboardRow.className = 'gameKeyboard__line';
-                this.gameKeyboard.appendChild(keyboardRow);
-                return;
-            }
-            const button = new letterButton(keyboardRow, el, !/[а-яА-Я]/i.test(el));
-            const that = this;
-            button.callback = function (e) {
-                if (this.control && this.letter.toLowerCase() === 'enter') {
-                    that.enterClick(that);
-                    return;
-                }
-                if (this.control && this.letter.toLowerCase() === 'backspace') {
-                    that.backspaceClick(that);
-                    return;
-                }
-                if (that.input.length < that.wordLength) {
-                    that.currentRow.children[that.input.length].innerText = this.letter.toUpperCase();
-                    that.input.push(this.letter.toLowerCase());  
-                }
-            }
-            this.buttons.push(button);
-        });
-    }
-
-    createGameFieldRow() {
-        this.currentRow = document.createElement('div');
-        this.currentRow.className = 'gameField__row';
-        this.gameField.appendChild(this.currentRow);
-
-        for (let i = 0; i < this.wordLength; i++) {
-            const letterInRow = document.createElement('div');
-            letterInRow.className = 'gameField__letter';
-            this.currentRow.appendChild(letterInRow);
-        }
-
-        this.gameField.scrollTop = this.gameField.scrollHeight;
-    }
-
     showAlertMessage(message, type) {
-        if (this.messages.filter(el => el.dataset.type === type).length !== 0) {
+        if (this.messages.filter(el => el.type === type).length !== 0) {
             return;
         }
-        const alertMessage = document.createElement('div');
-        alertMessage.className = 'gameField__alert';
-        alertMessage.innerText = message;
-        alertMessage.dataset.type = type;
-        document.body.appendChild(alertMessage);
+
+        const alertMessage = new AlertMessage({
+            msg: message,
+            wait: 2000,
+            animationDuration: 1000,
+            type: type
+        });
         this.messages.push(alertMessage);
-        setTimeout(() => {
-            alertMessage.classList.add('gameField__alert-hide');
-            setTimeout(() => {
-                this.messages = this.messages.filter(el => el !== alertMessage);
-                alertMessage.classList.remove('gameField__alert-hide');
-                alertMessage.remove();
-            }, 1000);
-        }, 2000);
+
+        alertMessage.fade().then(_ => this.messages = this.messages.filter(el => el !== alertMessage));
     }
 
-    enterClick(_that = this) {
-        if (_that.input.length === _that.wordLength) {
-            if (!_that.lexicon.hard.includes(_that.input.join(''))) {
-                _that.showAlertMessage('Такого слова нет!', 'Wrong word');
+    enterClick() {
+        if (this.input.length === this.wordLength) {
+            if (!lexicon.hard.includes(this.input.join(''))) {
+                this.showAlertMessage('Такого слова нет!', 'Wrong word');
                 return;
             }
-            let wordCopy = _that.word.split('');
-            let inputCopy = _that.input.slice();
+            let wordCopy = this.word.split('');
+            let inputCopy = this.input.slice();
             for (let i = 0; i < inputCopy.length; i++) {
-                const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
-                if (!currentLetter.found) {
-                    currentLetter.element.style.backgroundColor = 'var(--clr-wrong)';
+                const currentLetter = this.gameKeyboard.index(inputCopy[i]);
+                if (!this.gameKeyboard.found(currentLetter)) {
+                    this.gameKeyboard.setBgColor(currentLetter, 'var(--clr-wrong)');
                 }
-                _that.currentRow.children[i].style.backgroundColor = 'var(--clr-wrong)';
+                this.currentRow.setBgColor(i, 'var(--clr-wrong)');
                 if (inputCopy[i] === wordCopy[i]) {
-                    currentLetter.found = true;
-                    currentLetter.element.style.backgroundColor = 'var(--clr-found)';
+                    this.gameKeyboard.found(currentLetter, true);
+                    this.gameKeyboard.setBgColor(currentLetter, 'var(--clr-found)');
                     wordCopy[i] = '-';
                     inputCopy[i] = '*';
-                    _that.currentRow.children[i].style.backgroundColor = 'var(--clr-found)';
+                    this.currentRow.setBgColor(i, 'var(--clr-found)');
                     continue;
                 }
             }
             for (let i = 0; i < inputCopy.length; i++) {
                 if (wordCopy.includes(inputCopy[i])) {
-                    const currentLetter = _that.buttons.filter(el => el.letter === inputCopy[i])[0];
-                    if (!currentLetter.found) {
-                        currentLetter.element.style.backgroundColor = 'var(--clr-alert)'
+                    const currentLetter = this.gameKeyboard.index(inputCopy[i]);
+                    if (!this.gameKeyboard.found(currentLetter)) {
+                        this.gameKeyboard.setBgColor(currentLetter, 'var(--clr-alert)');
                     }
                     wordCopy[wordCopy.indexOf(inputCopy[i])] = '-';
                     inputCopy[i] = '*';
-                    _that.currentRow.children[i].style.backgroundColor = 'var(--clr-alert)';
+                    this.currentRow.setBgColor(i, 'var(--clr-alert)');
                     continue;
                 }
             }
 
-            if (_that.input.join('') !== _that.word) {
-                _that.attempts++;
-                _that.setSettings('attempts', _that.attempts);
-                _that.createGameFieldRow();
-                _that.input.length = 0;
+            if (this.input.join('') !== this.word) {
+                this.attempts++;
+                setSettings('attempts', this.attempts);
+                this.createGameFieldRow();
+                this.input.length = 0;
             } else {
-                _that.removeEvents(_that);
-                _that.attempts++;
-                _that.addStats();
-                _that.attempts = 0;
-                _that.setSettings('attempts', 0);
-                _that.removeSettings('startTime');
-                _that.seed = _that.random.x;
-                _that.setSettings('seed', _that.seed);
-                _that.showAlertMessage('Победа!', 'Victory alert');
+                this.removeEvents();
+                this.attempts++;
+                this.addStats();
+                this.attempts = 0;
+                setSettings('attempts', 0);
+                removeSettings('startTime');
+                this.seed = this.random.x;
+                setSettings('seed', this.seed);
+                this.showAlertMessage('Победа!', 'Victory alert');
+                // this.victory = new Modal(document.body, 'victory', this.currentRow.element.cloneNode(true));
             }
         }
     }
 
-    backspaceClick(_that) {
-        if (_that.input.length >= 1) {
-            _that.currentRow.children[_that.input.length - 1].innerText = '';
-            _that.input.pop();
+    backspaceClick() {
+        if (this.input.length >= 1) {
+            this.currentRow.setText(this.input.length - 1, '');
+            this.input.pop();
         }
     }
 
-    removeEvents(_that) {
-        document.removeEventListener('keydown', _that.main);
-        _that.buttons.forEach(el => el.element.onclick = null);
+    removeEvents() {
+        document.removeEventListener('keydown', this.main);
+        this.gameKeyboard.buttons.forEach(el => el.element.onclick = null);
     }
 
     addStats() {
@@ -233,19 +212,7 @@ class Game {
             attempts: this.attempts,
             time: Date.now() - this.startTime
         });
-        this.setSettings('stats', this.stats);
-    }
-
-    getSettings(param) {
-        return JSON.parse(localStorage.getItem(param));
-    }
-
-    setSettings(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    removeSettings(param) {
-        localStorage.removeItem(param);
+        setSettings('stats', this.stats);
     }
 }
 
