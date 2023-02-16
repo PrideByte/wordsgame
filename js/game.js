@@ -187,6 +187,7 @@ class Game extends Element {
                 this.seed = this.random.x;
                 setSettings('seed', this.seed);
                 this.showAlertMessage('Победа!', 'Victory alert');
+                this.currentRow.victoryAnimation();
                 // this.victory = new Modal(document.body, 'victory', this.currentRow.element.cloneNode(true));
             }
         }
