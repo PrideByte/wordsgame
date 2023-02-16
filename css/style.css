@@ -8,6 +8,27 @@
     font-style: normal;
 }
 
+@keyframes victory {
+    0%, 20% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-30px);
+    }
+    50% {
+        transform: translateY(5px);
+    }
+    60% {
+        transform: translateY(-15px);
+    }
+    80% {
+        transform: translateY(2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -354,6 +375,11 @@ li {
     transition: background-color .2s ease-in-out,
                 border-color .2s ease-in-out;
 }
+
+.gameField__letter_victory {
+    animation: victory 1000ms ease calc(200ms * var(--index));
+}
+
 .gameField__alert {
     position: fixed;
     width: 200px;
