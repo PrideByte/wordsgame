@@ -17,3 +17,15 @@ export class Random {
         return this.x / this.m;
     }
 }
+
+export function getSettings(param) {
+    return JSON.parse(localStorage.getItem(param));
+}
+
+export function setSettings(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function removeSettings(param) {
+    localStorage.removeItem(param);
+}
