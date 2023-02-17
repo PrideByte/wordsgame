@@ -29,6 +29,15 @@
     }
 }
 
+@keyframes show {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -173,6 +182,11 @@ li {
     z-index: 200;
     padding: calc(var(--header-size) * 2);
     background-color: var(--overlay);
+    opacity: 0;
+}
+
+.gameModal__wrapper-show {
+    animation: show .4s ease-in-out normal forwards;
 }
 
 .gameModal {
@@ -193,6 +207,13 @@ li {
     min-height: 100%;
     overflow-y: scroll;
     padding-right: 10px;
+}
+
+.gameModal__content-centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .gameModal__content .gameField__row {
@@ -316,6 +337,16 @@ li {
     width: 45%;
 }
 
+.gameModal__btn {
+    margin-top: 50px;
+    padding: 8px 12px;
+    border: 1px solid var(--font-color);
+    border-radius: clamp(3px, calc(1vw - 1vh / 2), 6px);
+    box-shadow: inset 0 0 3px 1px var(--shadow);
+    cursor: pointer;
+    user-select: none;
+}
+
 .gameWrapper {
     width: 100%;
     max-width: 1024px;
@@ -352,16 +383,7 @@ li {
     justify-content: center;
     z-index: -1;
     opacity: 0;
-    animation: show-row 0.2s ease-in-out normal forwards;
-}
-
-@keyframes show-row {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+    animation: show 0.2s ease-in-out normal forwards;
 }
 
 .gameField__letter {
@@ -376,7 +398,7 @@ li {
                 border-color .2s ease-in-out;
 }
 
-.gameField__letter_victory {
+.gameField__letter-victory {
     animation: victory 1000ms ease calc(200ms * var(--index));
 }
 
@@ -428,6 +450,7 @@ li {
     transition: border-color .2s ease-in-out,
                 box-shadow .2s ease-in-out;
 }
+
 
 .gameKeyboard__key-special {
     font-family: 'wordsgameicons', 'Oswald', sans-serif;

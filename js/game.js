@@ -133,7 +133,7 @@ class Game extends Element {
         });
         this.messages.push(alertMessage);
 
-        alertMessage.fade().then(_ => this.messages = this.messages.filter(el => el !== alertMessage));
+        alertMessage.fade().then(() => this.messages = this.messages.filter(el => el !== alertMessage));
     }
 
     enterClick() {
@@ -187,8 +187,15 @@ class Game extends Element {
                 this.seed = this.random.x;
                 setSettings('seed', this.seed);
                 this.showAlertMessage('Победа!', 'Victory alert');
-                this.currentRow.victoryAnimation();
-                // this.victory = new Modal(document.body, 'victory', this.currentRow.element.cloneNode(true));
+                this.currentRow.victoryAnimation().then(() => {
+                    this.victory = new Modal(document.body, 'victory');
+                    this.victory.content.newGamebtn.callback = () => {
+                        this.victory.destroy();
+                        this.gameField.destroy();
+                        this.gameKeyboard.clear();
+                        this.init();
+                    }
+                });
             }
         }
     }
@@ -202,7 +209,7 @@ class Game extends Element {
 
     removeEvents() {
         document.removeEventListener('keydown', this.main);
-        this.gameKeyboard.buttons.forEach(el => el.element.onclick = null);
+        this.gameKeyboard.removeEvents();
     }
 
     addStats() {

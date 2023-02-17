@@ -4,10 +4,10 @@ import Rules from "./rules_modal_inner.js";
 import Victory from "./victory_scene_inner.js";
 
 export default class Modal extends Element {
-    constructor(parent, type, wordNode = null) {
+    constructor(parent, type) {
         const options = {
             parent: parent,
-            classNames: 'gameModal__wrapper'
+            classNames: ['gameModal__wrapper', 'gameModal__wrapper-show']
         }
         super(options);
 
@@ -33,7 +33,7 @@ export default class Modal extends Element {
         } else if (type === 'rules') {
             this.content = new Rules(this.modalContent.element);
         } else if (type === 'victory') {
-            this.content = new Victory(this.modalContent.element, wordNode);
+            this.content = new Victory(this.modalContent.element);
         }
 
         this.closebtn.callback = this.closeModal.bind(this);
