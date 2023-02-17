@@ -18,6 +18,8 @@ export default class Keyboard extends Element {
         });
         keyboardRow.element.onclick = null;
 
+        this.mainContext = mainContext;
+
         LETTERS.forEach(el => {
             if (el === '*') {
                 keyboardRow = new Element({
@@ -36,6 +38,10 @@ export default class Keyboard extends Element {
         });
 
         this.index = this.index.bind(this);
+        this.found = this.found.bind(this);
+        this.setBgColor = this.setBgColor.bind(this);
+        this.removeEvents = this.removeEvents.bind(this);
+        this.clear = this.clear.bind(this);
     }
 
     index(letter) {
@@ -51,5 +57,19 @@ export default class Keyboard extends Element {
 
     setBgColor(i, color) {
         this.buttons[i].element.style.backgroundColor = color;
+    }
+
+    removeEvents() {
+        this.buttons.forEach(el => {
+            el.element.onclick = null;
+        });
+    }
+
+    clear() {
+        this.buttons.forEach((el, i) => {
+            this.found(i, false);
+            this.setBgColor(i, null);
+            el.element.onclick = el.callback.bind(el);
+        })
     }
 }

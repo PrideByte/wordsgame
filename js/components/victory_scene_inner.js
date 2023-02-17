@@ -1,15 +1,26 @@
 import Element from "./default.js";
 
 export default class Victory {
-    constructor(parent, wordNode) {
+    constructor(parent) {
         this.parent = parent;
-        this.wordNode = wordNode;
-        
+        this.parent.classList.add('gameModal__content-centered')
 
         this.show();
     }
 
     show() {
-        this.parent.appendChild(this.wordNode);
+        const header = new Element({
+            parent: this.parent,
+            element: 'h2',
+            classNames: 'gameModal__title',
+            htmlContent: 'Победа!'
+        });
+
+        this.newGamebtn = new Element({
+            parent: this.parent,
+            element: 'div',
+            classNames: 'gameModal__btn',
+            htmlContent: 'Новая игра'
+        });
     }
 }

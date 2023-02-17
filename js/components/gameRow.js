@@ -12,7 +12,7 @@ export default class Row extends Element {
         for (let i = 0; i < wordLength; i++) {
             const letter = new Element({
                 parent: this.element,
-                classNames: 'gameField__letter',
+                classNames: 'gameField__letter'
             });
             letter.element.onclick = null;
             letter.element.style.setProperty('--index', i);
@@ -32,7 +32,10 @@ export default class Row extends Element {
 
     victoryAnimation() {
         [...this.element.children].forEach(element => {
-            element.classList.add('gameField__letter_victory');
+            element.classList.add('gameField__letter-victory');
         });
+        return new Promise(resolve =>   
+            this.element.children[this.element.children.length - 1].addEventListener('animationend', () => resolve('Animation ended'))
+        );
     }
 }
