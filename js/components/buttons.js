@@ -20,6 +20,6 @@ export default class LetterButton extends Element {
 
         this.letter = letter;
         this.control = control;
-        this.found = false;    
+        this.found = false;
     }
 }
