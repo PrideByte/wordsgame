@@ -69,7 +69,7 @@ export default class Keyboard extends Element {
         this.buttons.forEach((el, i) => {
             this.found(i, false);
             this.setBgColor(i, null);
-            el.element.onclick = el.callback.bind(el);
+            el.element.onclick = () => el.callback();
         })
     }
 }
